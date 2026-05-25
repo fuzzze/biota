@@ -12,13 +12,20 @@ export interface Gray {
   h: number;
 }
 
-/** RGBA over black background -> luminance (arcs ~255, transparent bg -> 0). */
+/**
+ * RGBA over black background -> per-pixel max(R,G,B) (HSV Value); arcs ~255, bg 0.
+ * The max channel (not the mean) so a *bright colored overlay* multiplied on top
+ * is undone: multiply scales the gray base by the overlay colour, and for vivid
+ * colours (at least one channel near 255) max(R,G,B) ≈ the original gray. For our
+ * neutral output (white arcs on black) max == mean, so plain images are unchanged.
+ */
 export function compositeLum(img: RGBA): Gray {
   const { data, width: w, height: h } = img;
   const px = new Float32Array(w * h);
   for (let i = 0, p = 0; i < px.length; i++, p += 4) {
     const al = data[p + 3] / 255;
-    px[i] = ((data[p] + data[p + 1] + data[p + 2]) / 3) * al;
+    const m = Math.max(data[p], data[p + 1], data[p + 2]);
+    px[i] = m * al;
   }
   return { px, w, h };
 }

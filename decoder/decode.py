@@ -98,7 +98,9 @@ def rs_decode_frame(allb):
 def composite_lum(path):
     a = np.asarray(Image.open(path).convert('RGBA')).astype(np.float32)
     al = a[..., 3:4] / 255.0
-    return (a[..., :3] * al).mean(2)          # arcs ~255, bg 0
+    # max channel (HSV Value), not mean: undoes a bright colored multiply overlay
+    # (vivid colour -> one channel ~255 -> max ~= base gray); == mean for neutral.
+    return (a[..., :3] * al).max(2)            # arcs ~255, bg 0
 
 def disk_mask(s):
     r = s // 2; yy, xx = np.ogrid[:s, :s]

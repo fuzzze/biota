@@ -43,6 +43,14 @@ function imageData(img: Image): RGBA {
   return { data: id.data, width: id.width, height: id.height };
 }
 
+// vivid HSV colour (s=v=1) -> RGB 0..255; no black/gray, for the overlay test
+function hsv(h: number): [number, number, number] {
+  const i = Math.floor(h * 6), f = h * 6 - i;
+  const q = 1 - f, t = f;
+  const m = [[1, t, 0], [q, 1, 0], [0, 1, t], [0, q, 1], [t, 0, 1], [1, 0, q]][i % 6];
+  return [m[0] * 255, m[1] * 255, m[2] * 255];
+}
+
 async function loadTemplates(): Promise<{ tpls: TemplateSet; tiles: Tile[] }> {
   const tpls: TemplateSet = []; // decoder references (PNG, same as Python/Sketch/Figma)
   for (let k = 0; k < 6; k++) {
@@ -99,6 +107,26 @@ async function main() {
     const { rgba, cols } = render(text, secret, kind, tiles);
     const res = decodeImage(rgba, tpls, secret);
     check(`${kind} (cols=${cols}, ${rgba.width}x${rgba.height})`, res.ok && res.text === text, `got ${JSON.stringify(res.text)} stage=${res.stage}`);
+  }
+
+  console.log("Colored overlay (bright multiply + JPEG) decode:");
+  {
+    const { rgba } = render(text, secret, "square", tiles);
+    const W = rgba.width, H = rgba.height;
+    const cv = createCanvas(W, H);
+    const ctx = cv.getContext("2d");
+    const id = ctx.createImageData(W, H);
+    const bd = rgba.data, md = id.data;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const p = (y * W + x) * 4;
+      const [or, og, ob] = hsv((((x + y) / (W + H)) * 3) % 1); // vivid hue sweep
+      md[p] = (bd[p] * or) / 255; md[p + 1] = (bd[p + 1] * og) / 255;
+      md[p + 2] = (bd[p + 2] * ob) / 255; md[p + 3] = 255;
+    }
+    ctx.putImageData(id, 0, 0);
+    const jpeg = await loadImage(cv.toBuffer("image/jpeg", 0.82 as any)); // lossy
+    const res = decodeImage(imageData(jpeg), tpls, secret);
+    check(`bright colored multiply + JPEG -> max-channel`, res.ok && res.text === text, `got ${JSON.stringify(res.text)} stage=${res.stage} ${res.message ?? ""}`);
   }
 
   console.log("Cross-tool: app encoder -> Python decoder:");
