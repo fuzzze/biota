@@ -1,0 +1,45 @@
+name: Windows build
+
+  on:
+    push:
+      branches: [main]
+    workflow_dispatch:
+
+  jobs:
+    build:
+      runs-on: windows-latest
+      defaults:
+        run:
+          working-directory: app
+      steps:
+        - uses: actions/checkout@v4
+  
+        - uses: actions/setup-node@v4
+          with:
+            node-version: 20
+            cache: npm
+            cache-dependency-path: app/package-lock.json
+  
+        - uses: dtolnay/rust-toolchain@stable
+
+        - uses: Swatinem/rust-cache@v2
+          with:
+            workspaces: app/src-tauri
+  
+        - name: Install frontend deps
+          run: npm ci
+
+        - name: Build portable Windows .exe
+          run: npx tauri build --no-bundle
+  
+        - name: Stage artifact
+          shell: pwsh
+          run: |
+            New-Item -ItemType Directory -Force -Path dist-win | Out-Null
+            Copy-Item src-tauri/target/release/app.exe dist-win/Biota.exe
+
+        - uses: actions/upload-artifact@v4
+          with:
+            name: Biota-windows-portable
+            path: app/dist-win/Biota.exe
+            if-no-files-found: error
