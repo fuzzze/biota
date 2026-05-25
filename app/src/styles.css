@@ -9,7 +9,7 @@
   --accent: #6ee7a8;
   --accent-dim: #2f6b4f;
   --danger: #f87171;
-  --radius: 10px;
+  --radius: 0;
   font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 13px;
 }
@@ -40,7 +40,7 @@ body { overflow-y: auto; }
 /* topbar */
 .topbar { display: flex; align-items: baseline; gap: 12px; }
 .brand { display: flex; align-items: center; gap: 8px; }
-.brand-mark { color: var(--accent); font-size: 16px; }
+.brand-mark { width: 20px; height: 20px; display: block; filter: invert(1); }
 .brand-name { font-weight: 700; letter-spacing: 3px; font-size: 15px; }
 .brand-sub { margin: 0; color: var(--muted); font-size: 11px; }
 
@@ -61,7 +61,7 @@ body { overflow-y: auto; }
   font: inherit;
   font-weight: 500;
   padding: 9px 12px;
-  border-radius: 7px;
+  border-radius: 0;
   cursor: pointer;
   transition: background .15s, color .15s;
 }
@@ -108,7 +108,7 @@ body { overflow-y: auto; }
   font: inherit;
   font-size: 12px;
   padding: 8px 6px;
-  border-radius: 7px;
+  border-radius: 0;
   cursor: pointer;
   transition: background .15s, color .15s;
 }
@@ -132,7 +132,7 @@ body { overflow-y: auto; }
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 6px;
+  border-radius: 0;
 }
 .eye:hover { color: var(--text); background: var(--surface-2); }
 .eye svg { width: 18px; height: 18px; }
@@ -202,7 +202,7 @@ body { overflow-y: auto; }
   width: 64px; height: 64px;
   object-fit: contain;
   background: #000;
-  border-radius: 6px;
+  border-radius: 0;
   border: 1px solid var(--border);
 }
 .drop-text { display: flex; flex-direction: column; gap: 3px; }

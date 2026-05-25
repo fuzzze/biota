@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="%BASE_URL%favicon.svg" />
     <title>Biota</title>
     <script type="module" src="/src/main.ts" defer></script>
   </head>
@@ -10,10 +11,10 @@
     <main class="app">
       <header class="topbar">
         <div class="brand">
-          <span class="brand-mark">◇</span>
+          <img class="brand-mark" src="%BASE_URL%favicon.svg" alt="" />
           <span class="brand-name">BIOTA</span>
         </div>
-        <p class="brand-sub">текст в поворотах тайлов</p>
+        <p class="brand-sub">червяки какие-то</p>
       </header>
 
       <nav class="tabs" id="tabs">
@@ -33,7 +34,7 @@
           <button class="seg" data-aspect="horizontal">Горизонтальная</button>
         </div>
 
-        <label class="field-label" for="enc-secret">Пароль</label>
+        <label class="field-label" for="enc-secret">Пароль (но можно и без него)</label>
         <div class="password">
           <input id="enc-secret" class="input" type="password" placeholder="секретная фраза" autocomplete="off" spellcheck="false" />
           <button class="eye" id="enc-eye" type="button" aria-label="Показать пароль"></button>
@@ -68,7 +69,7 @@
           </div>
         </div>
 
-        <label class="field-label" for="dec-secret">Пароль</label>
+        <label class="field-label" for="dec-secret">Пароль (но можно и без него)</label>
         <div class="password">
           <input id="dec-secret" class="input" type="password" placeholder="секретная фраза" autocomplete="off" spellcheck="false" />
           <button class="eye" id="dec-eye" type="button" aria-label="Показать пароль"></button>
