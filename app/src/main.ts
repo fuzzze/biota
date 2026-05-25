@@ -103,12 +103,11 @@ const btnEncode = $<HTMLButtonElement>("btn-encode");
 const btnSave = $<HTMLButtonElement>("btn-save");
 
 function initAspect() {
-  const segs = document.querySelectorAll<HTMLButtonElement>(".seg");
-  segs.forEach((seg) => seg.addEventListener("click", () => {
-    segs.forEach((s) => s.classList.toggle("is-active", s === seg));
-    currentAspect = seg.dataset.aspect as AspectKind;
+  const sel = $<HTMLSelectElement>("aspect");
+  sel.addEventListener("change", () => {
+    currentAspect = sel.value as AspectKind;
     if (encText.value.trim() && lastBlob) void doEncode();
-  }));
+  });
 }
 
 async function doEncode() {

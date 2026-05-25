@@ -11,7 +11,7 @@
     <main class="app">
       <header class="topbar">
         <div class="brand">
-          <img class="brand-mark" src="%BASE_URL%favicon.svg" alt="" />
+          <span class="brand-mark" aria-hidden="true"></span>
           <span class="brand-name">BIOTA</span>
         </div>
         <p class="brand-sub">червяки какие-то</p>
@@ -27,13 +27,6 @@
         <label class="field-label" for="enc-text">Сообщение</label>
         <textarea id="enc-text" class="textarea" rows="4" placeholder="Введите текст для кодирования…"></textarea>
 
-        <label class="field-label">Пропорции картинки</label>
-        <div class="segmented" id="aspect">
-          <button class="seg" data-aspect="vertical">Вертикальная</button>
-          <button class="seg is-active" data-aspect="square">Квадратная</button>
-          <button class="seg" data-aspect="horizontal">Горизонтальная</button>
-        </div>
-
         <label class="field-label" for="enc-secret">Пароль (но можно и без него)</label>
         <div class="password">
           <input id="enc-secret" class="input" type="password" placeholder="секретная фраза" autocomplete="off" spellcheck="false" />
@@ -41,6 +34,11 @@
         </div>
 
         <div class="actions">
+          <select class="select" id="aspect" aria-label="Пропорции картинки">
+            <option value="square" selected>Квадратная</option>
+            <option value="vertical">Вертикальная</option>
+            <option value="horizontal">Горизонтальная</option>
+          </select>
           <button class="btn btn-primary" id="btn-encode">Закодировать</button>
           <button class="btn btn-ghost" id="btn-clear">Очистить</button>
         </div>
