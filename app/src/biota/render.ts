@@ -3,7 +3,7 @@
 
 import { planLayout, chooseCols, type AspectKind, type Layout } from "./layout";
 import { encodeToDigits } from "./digits";
-import { RENDER_SCALE } from "./constants";
+import { RENDER_SCALE, TILE_BLEED } from "./constants";
 
 // Solid black background: identical to a transparent export for the decoder
 // (background luminance = 0), but the saved PNG is visible in any image viewer.
@@ -34,9 +34,11 @@ export function paintGrid(ctx: Ctx2D, layout: Layout, digits: number[], tiles: T
   layout.cells.forEach((cell, i) => {
     const d = i < digits.length ? digits[i] : 0;
     const t = tiles[d];
-    // Tiles are pre-rasterized at their final pixel size (TILE_PX) — blit 1:1.
+    // Tiles are pre-rasterized at their final pixel size (TILE_PX); blit them with
+    // a small per-side bleed so neighbouring arcs overlap and leave no seam.
+    const dw = t.w + 2 * TILE_BLEED, dh = t.h + 2 * TILE_BLEED;
     (ctx.drawImage as (img: unknown, dx: number, dy: number, dw: number, dh: number) => void)(
-      t.img, cell.cx - t.w / 2, cell.cy - t.h / 2, t.w, t.h,
+      t.img, cell.cx - dw / 2, cell.cy - dh / 2, dw, dh,
     );
   });
 }

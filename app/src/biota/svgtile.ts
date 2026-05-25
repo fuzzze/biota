@@ -6,7 +6,7 @@
 
 const CENTER = 170; // viewBox center == hexagon center
 
-/** The 6 rotation variants of the base tile SVG, indexed by digit 0..5. */
+/** The 6 rotation variants of the encoder tile SVG, indexed by digit 0..5. */
 export function rotatedTileSvgs(base: string): string[] {
   return [0, 1, 2, 3, 4, 5].map((d) => {
     if (d === 0) return base;

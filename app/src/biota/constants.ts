@@ -15,3 +15,8 @@ export const RENDER_SCALE = 0.5;
 // letting paintGrid blit the tile 1:1 (no extra scaling) for maximum sharpness.
 export const TILE_PX = Math.round(W0 * RENDER_SCALE);
 
+// Per-side overlap (px) when painting tiles. Adjacent tiles' arcs are continuous
+// across the shared hexagon edge, but each is anti-aliased there; overlapping by a
+// couple of pixels lets a neighbour's solid arc cover the fade, removing the seam.
+export const TILE_BLEED = 2;
+
