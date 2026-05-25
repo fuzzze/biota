@@ -10,3 +10,6 @@ venv/
 # scratch
 /tmp/
 *.tmp
+
+# downloaded CI artifacts
+/dist-windows/
