@@ -33,7 +33,7 @@ const EYE = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 const EYE_OFF = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.9 4.2A10.9 10.9 0 0 1 12 4c6.5 0 10 7 10 7a18.5 18.5 0 0 1-3 3.9M6.6 6.6A18.6 18.6 0 0 0 2 11s3.5 7 10 7a10.8 10.8 0 0 0 4.2-.8"/><path d="m9.9 9.9a3 3 0 0 0 4.2 4.2"/><path d="M2 2l20 20"/></svg>`;
 
 // ---------- shared state ----------
-let templateImages: HTMLImageElement[] = [];
+let encoderTiles: Tile[] = [];
 let templateSet: TemplateSet = [];
 let currentAspect: AspectKind = "square";
 let lastBlob: Blob | null = null;
@@ -122,8 +122,7 @@ async function doEncode() {
     canvas.width = layout.width;
     canvas.height = layout.height;
     const ctx = canvas.getContext("2d")!;
-    const tiles: Tile[] = templateImages.map((img) => ({ img, w: img.naturalWidth, h: img.naturalHeight }));
-    paintGrid(ctx, layout, digits, tiles);
+    paintGrid(ctx, layout, digits, encoderTiles);
     const blob = await new Promise<Blob>((res, rej) =>
       canvas.toBlob((b) => (b ? res(b) : rej(new Error("toBlob failed"))), "image/png"));
     lastBlob = blob;
@@ -251,8 +250,8 @@ async function main() {
   btnDecode.addEventListener("click", () => void doDecode());
 
   try {
-    const { images, set } = await loadTemplates();
-    templateImages = images;
+    const { tiles, set } = await loadTemplates();
+    encoderTiles = tiles;
     templateSet = set;
     $("loading").classList.add("is-hidden");
   } catch (e) {

@@ -34,9 +34,9 @@ export function paintGrid(ctx: Ctx2D, layout: Layout, digits: number[], tiles: T
   layout.cells.forEach((cell, i) => {
     const d = i < digits.length ? digits[i] : 0;
     const t = tiles[d];
-    const w = t.w * RENDER_SCALE, h = t.h * RENDER_SCALE;
+    // Tiles are pre-rasterized at their final pixel size (TILE_PX) — blit 1:1.
     (ctx.drawImage as (img: unknown, dx: number, dy: number, dw: number, dh: number) => void)(
-      t.img, cell.cx - w / 2, cell.cy - h / 2, w, h,
+      t.img, cell.cx - t.w / 2, cell.cy - t.h / 2, t.w, t.h,
     );
   });
 }

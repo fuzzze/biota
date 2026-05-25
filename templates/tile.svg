@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="340px" height="340px" viewBox="0 0 340 340" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Polygon</title>
+    <defs>
+        <path d="M170,-89 C217.496488,-89 256,-50.4964885 256,-3 C256,13.5961275 251.298993,29.0942761 243.155943,42.2354831 L317.224319,85 L317.226017,170.216643 C443.373653,175.571848 544,279.534653 544,407 C544,537.891486 437.891486,644 307,644 C255.956694,644 208.682232,627.86366 169.999524,600.413891 C131.316958,627.863937 84.0428688,644 33,644 C-97.8914857,644 -204,537.891486 -204,407 C-204,279.534653 -103.373653,175.571848 22.7739833,170.216643 L22.7756814,85 L96.8446736,42.236478 C88.7012439,29.0950584 84,13.5965464 84,-3 C84,-50.4964885 122.503512,-89 170,-89 Z" id="path-1"></path>
+        <polygon id="path-2" points="170 0 317.224319 85 317.224319 255 170 340 22.7756814 255 22.7756814 85"></polygon>
+        <circle id="path-4" cx="33" cy="407" r="237"></circle>
+        <filter x="-22.4%" y="-22.4%" width="144.7%" height="144.7%" filterUnits="objectBoundingBox" id="filter-5">
+            <feMorphology radius="40" operator="dilate" in="SourceAlpha" result="shadowSpreadOuter1"></feMorphology>
+            <feOffset dx="0" dy="0" in="shadowSpreadOuter1" result="shadowOffsetOuter1"></feOffset>
+            <feMorphology radius="40" operator="erode" in="SourceAlpha" result="shadowInner"></feMorphology>
+            <feOffset dx="0" dy="0" in="shadowInner" result="shadowInner"></feOffset>
+            <feComposite in="shadowOffsetOuter1" in2="shadowInner" operator="out" result="shadowOffsetOuter1"></feComposite>
+            <feGaussianBlur stdDeviation="22" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 1 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Work" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Polygon" xlink:href="#path-1">
+            <g id="Oval-2">
+                <mask id="mask-3" fill="white">
+                    <use xlink:href="#path-2"></use>
+                </mask>
+                <use id="Mask" fill="#000000" xlink:href="#path-2"></use>
+                <circle stroke="#FFFFFF" stroke-width="60" mask="url(#mask-3)" cx="307" cy="407" r="237"></circle>
+                <g mask="url(#mask-3)">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-5)" xlink:href="#path-4"></use>
+                    <use stroke="#000000" stroke-width="80" xlink:href="#path-4"></use>
+                    <use stroke="#FFFFFF" stroke-width="60" xlink:href="#path-4"></use>
+                </g>
+                <circle stroke="#FFFFFF" stroke-width="60" mask="url(#mask-3)" cx="170" cy="-3" r="86"></circle>
+            </g>
+        </g>
+    </g>
+</svg>

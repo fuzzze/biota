@@ -16,7 +16,8 @@ Biota кодирует текст в углы поворота шестиуго�
 - `encoder/figma/{manifest.json,code.js,ui.html}` — плагин Figma. `ui.html` (iframe, есть WebCrypto) делает крипто+RS+цифры; `code.js` (sandbox) строит инстансы. Связь через `postMessage`.
 - `decoder/decode.py` — Python-декодер (CLI). Автодетект сетки + классификация + RS + расшифровка. CLI: argv или интерактив.
 - `app/` — десктоп-приложение (Tauri 2, vanilla TS). `src/biota/*` — полный порт энкодера И декодера на TS (4-я кодовая база); `src-tauri` — тонкий Rust (команда `save_file` + плагин диалога). Тесты: `app/tests/run.ts` (`npm test`) сверяют ядро с Python и сэмплом. Подробности — `app/README.md`.
-- `templates/tpl_0..5.png` — эталоны: тайл в поворотах `0..300°`, @1x, белые арки на прозрачном фоне. (Скопированы в `app/src/assets/templates/` — при регенерации обновляй обе копии.)
+- `templates/tpl_0..5.png` — эталоны: тайл в поворотах `0..300°`, @1x, белые арки на прозрачном фоне. (Скопированы в `app/src/assets/templates/` — при регенерации обновляй обе копии.) Используются **декодером** (NCC) во всех базах.
+- `templates/tile.svg` — векторный источник того же тайла (rotation 0, viewBox `0 0 340 340`, центр `170,170`). App-**энкодер** растеризует его на 6 поворотов (`app/src/biota/svgtile.ts`: `rotate(d·60°)`; `+60°`≡`tpl_1`) при `TILE_PX = round(W0·RENDER_SCALE)` → чёткий вывод на любом масштабе. (Копия в `app/src/assets/tile.svg` — держи синхронно; должен визуально совпадать с PNG-эталонами, иначе NCC рассинхронится.)
 - `tools/sketch-export-templates.js` — регенерация эталонов из Sketch.
 - `samples/sample_encrypted.png` — демо: text `"Welcome to Biota! Secret message hidden in tile rotations."`, secret `biota-demo`, COLS=10.
 

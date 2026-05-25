@@ -1,7 +1,7 @@
 // Node verification harness (run from app/ dir):  npx tsx tests/run.ts
 // Validates the TS port against the Python reference and the existing sample.
 import { createCanvas, loadImage, type Image } from "@napi-rs/canvas";
-import { writeFileSync } from "node:fs";
+import { writeFileSync, readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -10,6 +10,8 @@ import { decodeImage, type TemplateSet } from "../src/biota/decode";
 import { type AspectKind } from "../src/biota/layout";
 import { rsEncode, rsDecodeChunk } from "../src/biota/rs";
 import { planEncode, paintGrid, type Tile } from "../src/biota/render";
+import { rotatedTileSvgs, sizedSvg } from "../src/biota/svgtile";
+import { TILE_PX } from "../src/biota/constants";
 import { compositeLum, type RGBA } from "../src/biota/imaging";
 
 const TPL_DIR = "../templates";
@@ -41,29 +43,34 @@ function imageData(img: Image): RGBA {
   return { data: id.data, width: id.width, height: id.height };
 }
 
-async function loadTemplates(): Promise<{ tpls: TemplateSet; imgs: Image[] }> {
-  const imgs: Image[] = [];
-  const tpls: TemplateSet = [];
+async function loadTemplates(): Promise<{ tpls: TemplateSet; tiles: Tile[] }> {
+  const tpls: TemplateSet = []; // decoder references (PNG, same as Python/Sketch/Figma)
   for (let k = 0; k < 6; k++) {
     const img = await loadImage(`${TPL_DIR}/tpl_${k}.png`);
-    imgs.push(img);
     tpls.push({ gray: compositeLum(imageData(img)) });
   }
-  return { tpls, imgs };
+  // encoder tiles rasterized from the vector source, one per digit rotation
+  const base = readFileSync(`${TPL_DIR}/tile.svg`, "utf8");
+  const svgs = rotatedTileSvgs(base).map((s) => sizedSvg(s, TILE_PX));
+  const tiles: Tile[] = [];
+  for (const s of svgs) {
+    const img = await loadImage(Buffer.from(s));
+    tiles.push({ img, w: img.width, h: img.height });
+  }
+  return { tpls, tiles };
 }
 
-function render(text: string, secret: string, kind: AspectKind, imgs: Image[]) {
+function render(text: string, secret: string, kind: AspectKind, tiles: Tile[]) {
   const { digits, cols, layout } = planEncode(text, secret, kind);
   const canvas = createCanvas(layout.width, layout.height);
   const ctx = canvas.getContext("2d");
-  const tiles: Tile[] = imgs.map((img) => ({ img, w: img.width, h: img.height }));
   paintGrid(ctx as any, layout, digits, tiles);
   const id = ctx.getImageData(0, 0, canvas.width, canvas.height);
   return { rgba: { data: id.data, width: id.width, height: id.height } as RGBA, png: canvas.toBuffer("image/png"), cols, layout };
 }
 
 async function main() {
-  const { tpls, imgs } = await loadTemplates();
+  const { tpls, tiles } = await loadTemplates();
 
   console.log("RS decode (errors-only correction):");
   {
@@ -89,7 +96,7 @@ async function main() {
   const text = "Привет, Biota! 🌿 Round-trip 123 — проверка.";
   const secret = "correct horse battery staple";
   for (const kind of ["vertical", "square", "horizontal"] as AspectKind[]) {
-    const { rgba, cols } = render(text, secret, kind, imgs);
+    const { rgba, cols } = render(text, secret, kind, tiles);
     const res = decodeImage(rgba, tpls, secret);
     check(`${kind} (cols=${cols}, ${rgba.width}x${rgba.height})`, res.ok && res.text === text, `got ${JSON.stringify(res.text)} stage=${res.stage}`);
   }
@@ -101,7 +108,7 @@ async function main() {
       console.log("  ⊘ skipped (no Python with numpy/scipy/pillow/reedsolo in PATH)");
       skip++;
     } else {
-      const { png } = render(text, secret, "square", imgs);
+      const { png } = render(text, secret, "square", tiles);
       const p = join(tmpdir(), `biota_xtool_${Date.now()}.png`);
       writeFileSync(p, png);
       try {
