@@ -163,18 +163,26 @@ def read_digits(grid):
     # geometry is fixed by the scheme: derive dx/dy/off from detected scale (no drift)
     dx = DX0 * scale; dy = DY0 * scale; off = dx / 2.0
     ys = [p[0] for p in pts]; y0 = min(ys)
-    ay = y0 + float(np.median([(y - y0) - dy * round((y - y0) / dy) for y in ys]))
-    ridx = lambda y: int(round((y - ay) / dy))
-    parity_off = lambda r: off if r % 2 == 0 else 0.0
-    vals = [x - parity_off(ridx(y)) for y, x, c in pts]; x0 = min(vals)
+    ay0 = y0 + float(np.median([(y - y0) - dy * round((y - y0) / dy) for y in ys]))
+    ridx = lambda y: int(round((y - ay0) / dy))
+    # trim sparse boundary rows: image margins can spawn spurious peaks that shift
+    # row indices and flip the even/odd shift parity (Biota pads to full rows).
+    rowc = {}
+    for y, x, c in pts: rowc[ridx(y)] = rowc.get(ridx(y), 0) + 1
+    maxrow = max(rowc.values())
+    dense = [r for r, n in rowc.items() if n >= max(2, 0.4 * maxrow)]
+    r_lo, r_hi = min(dense), max(dense)
+    R = r_hi - r_lo + 1
+    ay = ay0 + r_lo * dy   # origin of 0-based row 0 = top dense row = encoder row 0
+    parity_off = lambda r: off if r % 2 == 0 else 0.0   # r is 0-based
+    inb = [(y, x, c) for y, x, c in pts if r_lo <= ridx(y) <= r_hi]
+    vals = [x - parity_off(ridx(y) - r_lo) for y, x, c in inb]; x0 = min(vals)
     ax = x0 + float(np.median([(v - x0) - dx * round((v - x0) / dx) for v in vals]))
 
     raw = {}
-    for y, x, c in pts:
-        r = ridx(y); cc = int(round((x - parity_off(r) - ax) / dx)); k = (r, cc)
+    for y, x, c in inb:
+        r = ridx(y) - r_lo; cc = int(round((x - parity_off(r) - ax) / dx)); k = (r, cc)
         if k not in raw or c > raw[k][2]: raw[k] = (y, x, c)
-    minr = min(r for r, _ in raw); raw = {(r - minr, cc): v for (r, cc), v in raw.items()}; ay += minr * dy
-    R = max(r for r, _ in raw) + 1
     colc = {}
     for _, cc in raw: colc[cc] = colc.get(cc, 0) + 1
     valid = sorted(c for c, n in colc.items() if n >= max(2, 0.5 * R))

@@ -1,0 +1,26 @@
+{
+  "name": "app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "tsx tests/run.ts",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@fontsource/jetbrains-mono": "^5.2.8",
+    "@tauri-apps/api": "^2",
+    "@tauri-apps/plugin-dialog": "^2.7.1",
+    "@tauri-apps/plugin-opener": "^2"
+  },
+  "devDependencies": {
+    "@napi-rs/canvas": "^1.0.0",
+    "@tauri-apps/cli": "^2",
+    "tsx": "^4.22.3",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.3"
+  }
+}
