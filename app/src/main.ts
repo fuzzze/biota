@@ -97,23 +97,27 @@ const encText = $<HTMLTextAreaElement>("enc-text");
 const encSecret = $<HTMLInputElement>("enc-secret");
 const encStatus = $("enc-status");
 const previewImg = $<HTMLImageElement>("preview-img");
-const previewEmpty = $("preview-empty");
 const encDims = $("enc-dims");
 const btnEncode = $<HTMLButtonElement>("btn-encode");
 const btnSave = $<HTMLButtonElement>("btn-save");
 
 function initAspect() {
-  const sel = $<HTMLSelectElement>("aspect");
-  sel.addEventListener("change", () => {
-    currentAspect = sel.value as AspectKind;
+  const opts = document.querySelectorAll<HTMLButtonElement>(".aspect-opt");
+  opts.forEach((opt) => opt.addEventListener("click", () => {
+    opts.forEach((o) => {
+      const on = o === opt;
+      o.classList.toggle("is-active", on);
+      o.setAttribute("aria-checked", String(on));
+    });
+    currentAspect = opt.dataset.aspect as AspectKind;
     if (encText.value.trim() && lastBlob) void doEncode();
-  });
+  }));
 }
 
 async function doEncode() {
   const text = encText.value;
   if (!text) { setStatus(encStatus, "Введите сообщение", "error"); return; }
-  busy(btnEncode, true, "Кодирование…");
+  busy(btnEncode, true, "Шифрование…");
   await nextFrame();
   try {
     const { digits, cols, layout } = planEncode(text, encSecret.value, currentAspect);
@@ -128,15 +132,14 @@ async function doEncode() {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     previewUrl = URL.createObjectURL(blob);
     previewImg.src = previewUrl;
-    previewImg.style.display = "block";
-    previewEmpty.style.display = "none";
+    previewImg.classList.add("is-shown");
     encDims.textContent = `${layout.width}×${layout.height} px · ${cols}×${layout.rows} тайлов`;
-    btnSave.disabled = false;
+    btnSave.hidden = false;
     setStatus(encStatus, "");
   } catch (e) {
     setStatus(encStatus, "Ошибка кодирования: " + String((e as Error).message || e), "error");
   } finally {
-    busy(btnEncode, false, "Закодировать");
+    busy(btnEncode, false, "Зашифровать");
   }
 }
 
@@ -144,10 +147,9 @@ function doClear() {
   encText.value = "";
   encSecret.value = "";
   lastBlob = null;
-  btnSave.disabled = true;
-  previewImg.style.display = "none";
+  btnSave.hidden = true;
+  previewImg.classList.remove("is-shown");
   previewImg.removeAttribute("src");
-  previewEmpty.style.display = "";
   encDims.textContent = "";
   setStatus(encStatus, "");
   if (previewUrl) { URL.revokeObjectURL(previewUrl); previewUrl = null; }
