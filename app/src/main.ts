@@ -18,6 +18,15 @@ const nextFrame = () => new Promise<void>((r) => requestAnimationFrame(() => r()
 // Same codebase runs as a Tauri desktop app and as a static web app.
 const isTauri = typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
+// Register the PWA service worker so the web app installs to the home screen
+// and runs fully offline. Skipped under Tauri (no service workers there) and
+// in dev. `autoUpdate` swaps in new builds on the next visit silently.
+if (!isTauri && import.meta.env.PROD) {
+  import("virtual:pwa-register")
+    .then(({ registerSW }) => registerSW({ immediate: true }))
+    .catch(() => { /* offline support is best-effort */ });
+}
+
 function browserDownload(blob: Blob, name: string) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

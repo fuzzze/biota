@@ -18,20 +18,27 @@
 
 html, body {
   margin: 0;
-  height: 100%;
+  min-height: 100%;
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;
+  -webkit-text-size-adjust: 100%;
 }
 
-body { overflow-y: auto; }
+body { overflow-y: auto; overscroll-behavior-y: contain; }
 
 ::selection { background: var(--accent-dim); color: #fff; }
 
 .app {
   max-width: 720px;
   margin: 0 auto;
-  padding: 22px 24px 32px;
+  min-height: 100dvh;
+  /* Honor notch / home-indicator safe areas when installed (viewport-fit=cover). */
+  padding:
+    max(22px, env(safe-area-inset-top))
+    max(24px, env(safe-area-inset-right))
+    max(32px, env(safe-area-inset-bottom))
+    max(24px, env(safe-area-inset-left));
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -223,3 +230,29 @@ body { overflow-y: auto; }
   z-index: 10;
 }
 .loading.is-hidden { display: none; }
+
+/* ---------- mobile / touch ---------- */
+@media (max-width: 560px) {
+  /* 16px inputs stop iOS Safari from auto-zooming on focus. */
+  .textarea, .input { font-size: 16px; padding: 13px 14px; }
+  .password .input { padding-right: 46px; }
+
+  /* Comfortable tap targets (>=44px) for the primary controls. */
+  .tab { padding: 13px 14px; }
+  .btn { padding: 13px 16px; }
+  .btn-primary { min-height: 48px; }
+  .btn-icon, .aspect-opt { width: 44px; height: 44px; }
+  .eye { width: 38px; height: 38px; }
+
+  /* Keep the three encode controls on one row but let them breathe. */
+  .actions { gap: 8px; flex-wrap: wrap; }
+
+  .preview-img { max-height: 60vh; }
+  .dropzone { min-height: 104px; }
+}
+
+/* Touch devices: drop sticky :hover states that linger after a tap. */
+@media (hover: none) {
+  .tab:hover { background: transparent; color: var(--muted); }
+  .tab.is-active:hover { color: var(--accent); }
+}
